@@ -1,0 +1,77 @@
+import { Client, REST, Routes } from "discord.js";
+import { AnyCommandHandler } from "./command";
+import { Logger, ind } from "@logger";
+
+export type Scope = { type: "global" } | { type: "guild"; guildId: string };
+
+export class CommandRegistrar {
+  private _clientId: string;
+  private _rest: REST;
+
+  constructor(client: Client) {
+    if (!client.isReady()) {
+      Logger.error("Cannot update API before the client is ready");
+      process.exit(1);
+    }
+
+    const token = process.env["TOKEN"] ?? process.env["DISCORD_TOKEN"];
+    if (!token) {
+      Logger.error(
+        "Could not locate Discord token in environment variable\n" +
+          "(please ensure either `TOKEN` or `DISCORD_TOKEN` are set)",
+      );
+      process.exit(1);
+    }
+
+    this._clientId = client.user!.id;
+    this._rest = new REST({ version: "10" }).setToken(token);
+  }
+
+  private getCommandJSON(cmd: AnyCommandHandler) {
+    return cmd.data.toJSON?.() ?? cmd.data;
+  }
+
+  private getRoute(scope: Scope) {
+    if (scope.type === "guild") {
+      return {
+        path: Routes.applicationGuildCommands(this._clientId, scope.guildId),
+        label: `GUILD application commands (for <${scope.guildId}>)`,
+      };
+    }
+    return {
+      path: Routes.applicationCommands(this._clientId),
+      label: `GLOBAL application commands`,
+    };
+  }
+
+  async register(commands: AnyCommandHandler[], scope: Scope) {
+    const data = commands.map(this.getCommandJSON);
+    const route = this.getRoute(scope);
+
+    const updateOne = async (cmd: ReturnType<typeof this.getCommandJSON>) => {
+      let failed = false;
+
+      await this._rest.post(route.path, { body: cmd }).catch((e: Error) => {
+        failed = true;
+        Logger.error(`${ind(2)}[X] ${cmd.name}\n${e}`);
+      });
+
+      return failed ? 1 : 0;
+    };
+
+    const success = (res: unknown) => {
+      const count = Array.isArray(res) ? res.length : 0;
+      Logger.debug(`${ind(1)}[/] Updated ${count} ${route.label}`);
+    };
+
+    const failure = async (err: Error) => {
+      Logger.error(`${ind(1)}[/] Failed to bulk-update ${route.label}`);
+      let failures = (await Promise.all(data.map(updateOne))) as number[];
+      let failureCount = failures.reduce((acc, curr) => acc + curr, 0);
+      if (failureCount === 0)
+        Logger.error(`${ind(2)} All commands updated; initial error:\n${err}`);
+    };
+
+    await this._rest.put(route.path, { body: data }).then(success).catch(failure);
+  }
+}

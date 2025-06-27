@@ -1,0 +1,29 @@
+/* Visit https://aka.ms/tsconfig to read more about this file */
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@app/*": ["app/*"],
+      "@registry": ["registry/index.ts"],
+      "@database": ["database/index.ts"],
+      "@logger": ["logger.ts"]
+    },
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "noPropertyAccessFromIndexSignature": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "declaration": false,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "resolveJsonModule": true,
+    "outDir": "dist",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@discordjs/typings"
+    ]
+  },
+  "include": ["src", "*.d.ts"],
+  "exclude": ["node_modules"]
+}
