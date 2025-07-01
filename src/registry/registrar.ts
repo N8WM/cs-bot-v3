@@ -1,6 +1,8 @@
 import { Client, REST, Routes } from "discord.js";
-import { AnyCommandHandler } from "./command";
+
 import { Logger, ind } from "@logger";
+import { AnyCommandHandler } from "./command";
+import { registry } from "./registry";
 
 export type Scope = { type: "global" } | { type: "guild"; guildId: string };
 
@@ -14,17 +16,8 @@ export class CommandRegistrar {
       process.exit(1);
     }
 
-    const token = process.env["TOKEN"] ?? process.env["DISCORD_TOKEN"];
-    if (!token) {
-      Logger.error(
-        "Could not locate Discord token in environment variable\n" +
-          "(please ensure either `TOKEN` or `DISCORD_TOKEN` are set)",
-      );
-      process.exit(1);
-    }
-
     this._clientId = client.user!.id;
-    this._rest = new REST({ version: "10" }).setToken(token);
+    this._rest = new REST({ version: "10" }).setToken(registry!.options.token);
   }
 
   private getCommandJSON(cmd: AnyCommandHandler) {
@@ -72,6 +65,9 @@ export class CommandRegistrar {
         Logger.error(`${ind(2)} All commands updated; initial error:\n${err}`);
     };
 
-    await this._rest.put(route.path, { body: data }).then(success).catch(failure);
+    await this._rest
+      .put(route.path, { body: data })
+      .then(success)
+      .catch(failure);
   }
 }

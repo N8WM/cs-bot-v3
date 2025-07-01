@@ -9,6 +9,7 @@ export let registry: Registry | null = null;
 
 export type RegistryOptions = {
   client: Client;
+  token: string;
   commandsPath: string;
   eventsPath: string;
   devGuildIds?: string[];
@@ -48,6 +49,7 @@ export class Registry {
 
   async init() {
     Logger.debug("Registering [E]vents and [C]ommands...");
+
     await this.registerEvents();
     await this.registerCommands();
   }
@@ -56,9 +58,11 @@ export class Registry {
     await read<AnyCommandHandler>(this._opts.commandsPath, (node, depth) => {
       const cname = node.data.data.name ?? node.name ?? "undefined";
       const category = depth > 0 ? node.parent : undefined;
+
       Logger.debug(
         `${ind(1)}[C] ${cname.padEnd(25)} (${node.name})${category ? " <" + category + ">" : ""}`,
       );
+
       this._commands.set(cname, {
         handler: node.data,
         name: cname,
@@ -71,6 +75,7 @@ export class Registry {
     await read<AnyEventHandler>(`${__dirname}/events`, (node, depth) =>
       this.registerEvent(node, depth, true),
     );
+
     await read<AnyEventHandler>(
       this._opts.eventsPath,
       this.registerEvent.bind(this),
@@ -84,6 +89,7 @@ export class Registry {
   ) {
     const ename = node.parent as keyof ClientEvents;
     const ehandler = node.data as EventHandler<keyof ClientEvents>;
+
     const ereg = (
       ehandler.once ? this._opts.client.once : this._opts.client.on
     ).bind(this._opts.client);

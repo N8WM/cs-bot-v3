@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { Client, GatewayIntentBits } from "discord.js";
 
-import _config from "@app/config";
+import config from "@config";
 import { Registry } from "@registry";
 
 async function main() {
@@ -18,14 +18,14 @@ async function main() {
 
   const registry = new Registry({
     client,
-    commandsPath: _config.paths.commands,
-    eventsPath: _config.paths.events,
-    devGuildIds: _config.devGuildIds,
-    devUserIds: _config.devUserIds,
+    token: config.token,
+    commandsPath: config.paths.commands,
+    eventsPath: config.paths.events,
+    devGuildIds: config.devGuildIds,
   });
 
   await registry.init();
-  await client.login(_config.token);
+  await client.login(config.token);
 }
 
 main();

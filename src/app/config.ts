@@ -8,7 +8,10 @@ const _arr = (strlist: string) => {
 const _config = {
   token: process.env.TOKEN!,
   devGuildIds: _arr(process.env.DEV_GUILD_IDS!),
-  devUserIds: _arr(process.env.DEV_USER_IDS!),
+  dbName: process.env.DB_NAME!,
+  dbHost: process.env.DB_HOST!,
+  dbUsername: process.env.DB_USERNAME!,
+  dbPassword: process.env.DB_PASSWORD!,
   paths: {
     commands: `${__dirname}/commands`,
     events: `${__dirname}/events`,
