@@ -2,7 +2,7 @@ import { Client, REST, Routes } from "discord.js";
 
 import { Logger, ind } from "@logger";
 import { AnyCommandHandler } from "./command";
-import { registry } from "./registry";
+import { Registry } from "./registry";
 
 export type Scope = { type: "global" } | { type: "guild"; guildId: string };
 
@@ -17,7 +17,7 @@ export class CommandRegistrar {
     }
 
     this._clientId = client.user!.id;
-    this._rest = new REST({ version: "10" }).setToken(registry!.options.token);
+    this._rest = new REST({ version: "10" }).setToken(Registry.options.token);
   }
 
   private getCommandJSON(cmd: AnyCommandHandler) {

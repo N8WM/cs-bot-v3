@@ -2,7 +2,7 @@ import { Events, MessageFlags } from "discord.js";
 
 import { Logger } from "@logger";
 
-import { registry } from "../../registry";
+import { Registry } from "../../registry";
 import { EventHandler } from "../../event";
 import { CommandHandler } from "../../command";
 
@@ -10,8 +10,10 @@ const handler: EventHandler<Events.InteractionCreate> = {
   async execute(interaction) {
     if (!interaction.isCommand()) return;
 
-    const command = registry!.commands.get(interaction.commandName)!;
-    const handler = command.handler as CommandHandler<typeof command.handler.type>;
+    const command = Registry.commands.get(interaction.commandName)!;
+    const handler = command.handler as CommandHandler<
+      typeof command.handler.type
+    >;
 
     Logger.debug(
       `[${handler.data.name}] command from ${interaction.user.username} <${interaction.user.id}>`,

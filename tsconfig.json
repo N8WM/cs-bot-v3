@@ -1,20 +1,20 @@
 /* Visit https://aka.ms/tsconfig to read more about this file */
 {
+  "$schema": "https://json.schemastore.org/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
       "@app/*": ["app/*"],
       "@registry": ["registry/index.ts"],
-      "@database": ["database/index.ts"],
-      "@database/repos/*": ["database/repos/*"],
-      "@models/*": ["models/*"],
-      "@services/*": ["services/*"],
+      "@services": ["services/index.ts"],
       "@util/*": ["util/*"],
       "@config": ["app/config.ts"],
-      "@logger": ["logger.ts"]
+      "@logger": ["logger.ts"],
+      "@generated/*": ["generated/*"],
     },
     "target": "ES2022",
     "module": "CommonJS",
+    "sourceMap": true,
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -27,6 +27,6 @@
     "outDir": "dist",
     "typeRoots": ["./node_modules/@types", "./node_modules/@discordjs/typings"]
   },
-  "include": ["src", "*.d.ts"],
+  "include": ["src", "__tests__", "*.d.ts"],
   "exclude": ["node_modules"]
 }

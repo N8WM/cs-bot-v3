@@ -1,0 +1,19 @@
+model Guild {
+  snowflake    String   @id
+  contactEmail String
+  dateAdded    DateTime
+
+  verifySettings VerifySettings?
+  verifiedUsers  User[]
+}
+
+model VerifySettings {
+  guildSnowflake String   @id
+  roleId         String
+  suffix         String
+  gmailAddress   String
+  gmailPassword  String
+  dateAdded      DateTime
+
+  guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
+}

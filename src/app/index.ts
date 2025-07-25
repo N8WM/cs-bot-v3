@@ -3,8 +3,14 @@ import { Client, GatewayIntentBits } from "discord.js";
 
 import config from "@config";
 import { Registry } from "@registry";
+import { PrismaClient } from "@generated/prisma";
+import { ServiceManager } from "@services";
+
+// Instantiate Prisma
+const prisma = new PrismaClient();
 
 async function main() {
+  // Instantiate Client
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -16,7 +22,8 @@ async function main() {
     ],
   });
 
-  const registry = new Registry({
+  // Set up Registry
+  await Registry.init({
     client,
     token: config.token,
     commandsPath: config.paths.commands,
@@ -24,8 +31,17 @@ async function main() {
     devGuildIds: config.devGuildIds,
   });
 
-  await registry.init();
+  // Set up services
+  ServiceManager.init(prisma);
+
+  // Dispatch application
   await client.login(config.token);
 }
 
-main();
+main()
+  .catch((e) => {
+    console.error(e.message);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

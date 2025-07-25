@@ -12,14 +12,13 @@ import {
   ThumbnailBuilder,
 } from "discord.js";
 
-import { getGuildSettings } from "@database";
 import { CommandHandlerInteraction } from "@registry";
+import { ServiceManager } from "@services";
 
-export function build(
+export async function build(
   interaction: CommandHandlerInteraction<ApplicationCommandType.ChatInput>,
 ) {
-  const settings = getGuildSettings(interaction.guildId!);
-
+  const settings = (await ServiceManager.verify.get(interaction.guildId!))!;
   return new ContainerBuilder()
     .setAccentColor([32, 191, 85])
     .addSectionComponents(
@@ -28,8 +27,8 @@ export function build(
           new TextDisplayBuilder().setContent(
             [
               "# Cal Poly Verification\n",
-              `*Use your **${settings.vrfDomainSuffix}** email address to verify your Discord `,
-              `account. Successfully completing this process grants the <@&${settings.vrfRoleId}> role.*`,
+              `*Use your **${settings.suffix}** email address to verify your Discord `,
+              `account. Successfully completing this process grants the <@&${settings.roleId}> role.*`,
             ].join(""),
           ),
         )
@@ -48,7 +47,7 @@ export function build(
       new TextDisplayBuilder().setContent(
         [
           "1. Press the **Start Email Verification** button below\n",
-          "2. Enter your Cal Poly email address to receive a six-digit verification code\n",
+          `2. Enter your **${settings.suffix}** email address to receive a six-digit verification code\n`,
           "3. Press the **Enter Code** button and copy the code from the email into the prompt",
         ].join(""),
       ),

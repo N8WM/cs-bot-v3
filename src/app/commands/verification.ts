@@ -34,7 +34,7 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
 
     await interaction.channel.sendTyping()
     await interaction.channel.send({
-      components: [buildVrf(interaction)],
+      components: [await buildVrf(interaction)],
       flags: [MessageFlags.IsComponentsV2]
     })
 

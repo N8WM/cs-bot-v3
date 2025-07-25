@@ -1,0 +1,11 @@
+model User {
+  userSnowflake  String
+  guildSnowflake String
+  email          String
+  dateAdded      DateTime
+
+  guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
+
+  @@id([userSnowflake, guildSnowflake])
+  @@unique([guildSnowflake, email])
+}

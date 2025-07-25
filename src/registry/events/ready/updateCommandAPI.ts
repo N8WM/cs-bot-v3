@@ -4,7 +4,7 @@ import { Logger } from "@logger";
 
 import { EventHandler } from "../../event";
 import { CommandRegistrar } from "../../registrar";
-import { registry } from "../../registry";
+import { Registry } from "../../registry";
 
 const handler: EventHandler<Events.ClientReady> = {
   async execute(client) {
@@ -12,7 +12,7 @@ const handler: EventHandler<Events.ClientReady> = {
     Logger.debug("Updating Application [/] Command API...");
 
     const registrar = new CommandRegistrar(client);
-    const commands = Array.from(registry!.commands.values());
+    const commands = Array.from(Registry.commands.values());
     const cmdHandlers = commands
       .map((c) => c.handler)
       .filter((c) => !c.options?.deleted);
@@ -24,7 +24,7 @@ const handler: EventHandler<Events.ClientReady> = {
       await registrar.register(guildCmds, { type: "guild", guildId: id });
 
     await registrar.register(globalCmds, { type: "global" });
-    await Promise.all(registry!.options.devGuildIds?.map(regGuildCmds) ?? []);
+    await Promise.all(Registry.options.devGuildIds?.map(regGuildCmds) ?? []);
 
     Logger.info(`Ready!`);
   },
