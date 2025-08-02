@@ -1,5 +1,5 @@
 import { Logger } from "@logger";
-import { PrismaClient } from "@generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 import { GuildService } from "./guildService";
 import { UserService } from "./userService";

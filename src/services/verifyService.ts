@@ -1,12 +1,12 @@
 import { Snowflake } from "discord.js";
 
+import { VerifySettings } from "@prisma/client";
+import { Result } from "@util/result";
 import { BaseService } from "./baseService";
-import { VerifySettings } from "@generated/prisma";
-import { getDateTime } from "@util/time";
 
 export enum VerifyStatus {
   Success = "Success",
-  GuildSnowflakeAlreadyExists = "This server is already registered",
+  GuildSnowflakeDoesNotExist = "This server has not been registered.",
   VerificationDisabled = "This server does not have verification enabled",
   VerificationEnabled = "This server already has verification enabled",
 }
@@ -26,31 +26,40 @@ export class VerifyService extends BaseService {
     guildSnowflake: Snowflake,
     roleId: string,
     suffix: string,
-    gmailAddress: string,
-    gmailPassword: string,
-  ) {
+  ): Promise<Result<VerifySettings>> {
     const existing = await this.get(guildSnowflake);
 
-    if (this.isEnabled(existing)) return VerifyStatus.VerificationEnabled;
+    if (this.isEnabled(existing))
+      await this.prisma.verifySettings.delete({ where: { guildSnowflake } });
 
-    const dateAdded = getDateTime();
+    const registered = await this.prisma.guild.findUnique({
+      where: { snowflake: guildSnowflake },
+    });
 
-    return await this.prisma.verifySettings.create({
+    if (registered === null)
+      return Result.err(VerifyStatus.GuildSnowflakeDoesNotExist);
+
+    const settings = await this.prisma.verifySettings.create({
       data: {
         guildSnowflake,
         roleId,
         suffix,
-        gmailAddress,
-        gmailPassword,
-        dateAdded,
       },
     });
+
+    return Result.ok(settings);
   }
 
-  async disable(guildSnowflake: Snowflake) {
+  async disable(guildSnowflake: Snowflake): Promise<Result<VerifySettings>> {
     const existing = await this.get(guildSnowflake);
-    if (!this.isEnabled(existing)) return VerifyStatus.VerificationDisabled;
+    if (!this.isEnabled(existing))
+      return Result.err(VerifyStatus.VerificationDisabled);
 
-    await this.prisma.verifySettings.delete({ where: { guildSnowflake } });
+    const settings = await this.prisma.verifySettings.delete({
+      where: { guildSnowflake },
+    });
+    await this.prisma.user.deleteMany({ where: { guildSnowflake } });
+
+    return Result.ok(settings);
   }
 }

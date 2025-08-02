@@ -10,9 +10,9 @@
       "@util/*": ["util/*"],
       "@config": ["app/config.ts"],
       "@logger": ["logger.ts"],
-      "@generated/*": ["generated/*"],
     },
     "target": "ES2022",
+    "lib": ["ESNEXT"],
     "module": "CommonJS",
     "sourceMap": true,
     "moduleResolution": "Node",
@@ -28,5 +28,5 @@
     "typeRoots": ["./node_modules/@types", "./node_modules/@discordjs/typings"]
   },
   "include": ["src", "__tests__", "*.d.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "src/_*_old"]
 }

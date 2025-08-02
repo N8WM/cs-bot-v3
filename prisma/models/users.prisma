@@ -2,7 +2,7 @@ model User {
   userSnowflake  String
   guildSnowflake String
   email          String
-  dateAdded      DateTime
+  createdAt      DateTime @default(now())
 
   guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
 

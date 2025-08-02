@@ -2,6 +2,7 @@ import {
   ApplicationCommandType,
   ContainerBuilder,
   MessageFlags,
+  RGBTuple,
   SeparatorBuilder,
   SeparatorSpacingSize,
   TextDisplayBuilder,
@@ -14,16 +15,23 @@ export type Status = {
   Failed: "Failed";
 };
 
+const colorMap: Map<keyof Status, RGBTuple> = new Map([
+  ["Success", [0, 255, 0]],
+  ["Failed", [255, 0, 0]]
+]);
+
 export function build(options: {
   status: keyof Status;
   operation: string;
   message?: string;
 }) {
-  const container = new ContainerBuilder().addTextDisplayComponents(
-    new TextDisplayBuilder().setContent(
-      `**${options.operation}: ${options.status}**`,
-    ),
-  );
+  const container = new ContainerBuilder()
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(
+        `-# *${options.operation}*\n## ${options.status}`,
+      ),
+    )
+    .setAccentColor(colorMap.get(options.status));
 
   if (options.message)
     container
@@ -43,8 +51,14 @@ export async function reply<T extends ApplicationCommandType>(
   interaction: CommandHandlerInteraction<T>,
   options: { status: keyof Status; operation: string; message?: string },
 ) {
-  await interaction.reply({
-    components: [build(options)],
-    flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
-  });
+  if (interaction.deferred || interaction.replied)
+    await interaction.editReply({
+      components: [build(options)],
+      flags: [MessageFlags.IsComponentsV2],
+    });
+  else
+    await interaction.reply({
+      components: [build(options)],
+      flags: [MessageFlags.IsComponentsV2, MessageFlags.Ephemeral],
+    });
 }

@@ -1,7 +1,8 @@
 model Guild {
   snowflake    String   @id
   contactEmail String
-  dateAdded    DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   verifySettings VerifySettings?
   verifiedUsers  User[]
@@ -11,9 +12,7 @@ model VerifySettings {
   guildSnowflake String   @id
   roleId         String
   suffix         String
-  gmailAddress   String
-  gmailPassword  String
-  dateAdded      DateTime
+  createdAt      DateTime @default(now())
 
   guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
 }

@@ -1,4 +1,4 @@
-import { Events, MessageFlags } from "discord.js";
+import { Events, InteractionReplyOptions, MessageFlags } from "discord.js";
 
 import { Logger } from "@logger";
 
@@ -21,13 +21,18 @@ const handler: EventHandler<Events.InteractionCreate> = {
 
     handler
       .run({ interaction: interaction, client: interaction.client })
-      .catch((e) => {
+      .catch(async (e) => {
         Logger.error(`Command Error (${handler.data.name}): ${e}`);
-        interaction.reply({
-          content:
-            "My apologies, an internal error has occurred. Please try again later.",
-          flags: [MessageFlags.Ephemeral],
-        });
+
+        const response: InteractionReplyOptions = {
+          content: "Yikes! There was an error processing your request.",
+          flags: interaction.ephemeral ? [MessageFlags.Ephemeral] : [],
+        };
+
+        if (interaction.deferred || interaction.replied)
+          await interaction.editReply({content: response.content});
+        else
+          await interaction.reply(response);
       });
   },
 };

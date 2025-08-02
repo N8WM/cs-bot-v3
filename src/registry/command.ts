@@ -5,7 +5,9 @@ import {
   ApplicationCommandType,
   ContextMenuCommandBuilder,
   ChatInputCommandInteraction,
+  SlashCommandOptionsOnlyBuilder,
   UserContextMenuCommandInteraction,
+  SlashCommandSubcommandsOnlyBuilder,
   PrimaryEntryPointCommandInteraction,
   MessageContextMenuCommandInteraction,
 } from "discord.js";
@@ -13,7 +15,10 @@ import {
 type CommandTypeMap = {
   [ApplicationCommandType.ChatInput]: {
     interaction: ChatInputCommandInteraction;
-    builder: SlashCommandBuilder;
+    builder:
+      | SlashCommandBuilder
+      | SlashCommandSubcommandsOnlyBuilder
+      | SlashCommandOptionsOnlyBuilder;
   };
   [ApplicationCommandType.User]: {
     interaction: UserContextMenuCommandInteraction;
@@ -26,10 +31,11 @@ type CommandTypeMap = {
   [ApplicationCommandType.PrimaryEntryPoint]: {
     interaction: PrimaryEntryPointCommandInteraction;
     builder: ContextMenuCommandBuilder;
-  }
+  };
 };
 
-export type CommandHandlerInteraction<T extends ApplicationCommandType> = CommandTypeMap[T]["interaction"];
+export type CommandHandlerInteraction<T extends ApplicationCommandType> =
+  CommandTypeMap[T]["interaction"];
 
 export type CommandHandlerOptions = {
   devOnly?: boolean;

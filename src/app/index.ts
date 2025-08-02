@@ -2,8 +2,9 @@ import "dotenv/config";
 import { Client, GatewayIntentBits } from "discord.js";
 
 import config from "@config";
+import { Logger } from "@logger";
 import { Registry } from "@registry";
-import { PrismaClient } from "@generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { ServiceManager } from "@services";
 
 // Instantiate Prisma
@@ -40,7 +41,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e.message);
+    Logger.error(e);
   })
   .finally(async () => {
     await prisma.$disconnect();

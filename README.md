@@ -15,6 +15,9 @@ npm i
 TOKEN="discordToken"
 DEV_GUILD_IDS="devServer1Id,devServer2Id"
 
+GMAIL_ADDRESS="address@ToSendEmailsFrom.com"
+GMAIL_PASSWORD="randompassword"
+
 DATABASE_URL="mysql://johndoe:randompassword@localhost:3306/mydb"
 # If lacking db add/drop perms, set up a shadow:
 # SHADOW_DATABASE_URL="mysql://johndoe:randompassword@localhost:3306/mydb"

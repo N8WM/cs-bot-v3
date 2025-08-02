@@ -1,7 +1,8 @@
 import { Snowflake } from "discord.js";
 
+import { User } from "@prisma/client";
+import { Result } from "@util/result";
 import { BaseService } from "./baseService";
-import { getDateTime } from "@util/time";
 
 export enum UserStatus {
   Success = "Success",
@@ -28,40 +29,40 @@ export class UserService extends BaseService {
     userSnowflake: Snowflake,
     guildSnowflake: Snowflake,
     email: string,
-  ) {
+  ): Promise<Result<User>> {
     const alreadySnowflake = await this.get(userSnowflake, guildSnowflake);
     const alreadyEmail = await this.prisma.user.findUnique({
       where: { guildSnowflake_email: { guildSnowflake, email } },
     });
 
-    if (alreadySnowflake && alreadyEmail) return UserStatus.UserAlreadyExists;
-    if (alreadySnowflake) return UserStatus.SnowflakeAlreadyExists;
-    if (alreadyEmail) return UserStatus.EmailAlreadyExists;
+    if (alreadySnowflake && alreadyEmail) return Result.err(UserStatus.UserAlreadyExists);
+    if (alreadySnowflake) return Result.err(UserStatus.SnowflakeAlreadyExists);
+    if (alreadyEmail) return Result.err(UserStatus.EmailAlreadyExists);
 
-    const dateAdded = getDateTime();
-
-    await this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         userSnowflake,
         guildSnowflake,
         email,
-        dateAdded,
       },
     });
 
-    return UserStatus.Success;
+    return Result.ok(user);
   }
 
-  async unverifyUser(userSnowflake: Snowflake, guildSnowflake: Snowflake) {
+  async unverifyUser(
+    userSnowflake: Snowflake,
+    guildSnowflake: Snowflake,
+  ): Promise<Result<User>> {
     const user = await this.get(userSnowflake, guildSnowflake);
-    if (!user) return UserStatus.UserDoesNotExist;
+    if (!user) return Result.err(UserStatus.UserDoesNotExist);
 
-    await this.prisma.user.delete({
+    const deleted = await this.prisma.user.delete({
       where: {
         userSnowflake_guildSnowflake: { userSnowflake, guildSnowflake },
       },
     });
 
-    return UserStatus.Success;
+    return Result.ok(deleted);
   }
 }

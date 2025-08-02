@@ -1,5 +1,6 @@
 import {
   ApplicationCommandType,
+  InteractionContextType,
   MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
@@ -11,7 +12,8 @@ const handler: CommandHandler<ApplicationCommandType.ChatInput> = {
   type: ApplicationCommandType.ChatInput,
   data: new SlashCommandBuilder()
     .setName("ping")
-    .setDescription('Responds with latency values'),
+    .setDescription("Responds with latency values")
+    .setContexts(InteractionContextType.Guild),
 
   async run({ interaction }) {
     await interaction.reply({

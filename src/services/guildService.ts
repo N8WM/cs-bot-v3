@@ -1,7 +1,8 @@
 import { Snowflake } from "discord.js";
 
+import { Guild } from "@prisma/client";
+import { Result } from "@util/result";
 import { BaseService } from "./baseService";
-import { getDateTime } from "@util/time";
 
 export enum GuildStatus {
   Success = "Success",
@@ -14,29 +15,57 @@ export class GuildService extends BaseService {
     return await this.prisma.guild.findUnique({ where: { snowflake } });
   }
 
-  async registerGuild(snowflake: Snowflake, contactEmail: string) {
-    if (await this.get(snowflake)) return GuildStatus.SnowflakeAlreadyExists;
+  async refreshGuilds(snowflakes: Snowflake[]) {
+    await this.prisma.guild.deleteMany({
+      where: { snowflake: { notIn: snowflakes } },
+    });
 
-    const dateAdded = getDateTime();
+    const update = await this.prisma.guild.updateMany({
+      where: { snowflake: { in: snowflakes } },
+      data: { updatedAt: new Date() },
+    });
 
-    await this.prisma.guild.create({
+    return update.count;
+  }
+
+  async registerGuild(
+    snowflake: Snowflake,
+    contactEmail: string,
+  ): Promise<Result<Guild>> {
+    if (await this.get(snowflake))
+      return Result.err(GuildStatus.SnowflakeAlreadyExists);
+
+    const guild = await this.prisma.guild.create({
       data: {
         snowflake,
         contactEmail,
-        dateAdded,
       },
     });
 
-    return GuildStatus.Success;
+    return Result.ok(guild);
   }
 
-  async updateContactEmail(snowflake: Snowflake, contactEmail: string) {
-    if (!(await this.get(snowflake))) return GuildStatus.SnowflakeDoesNotExist;
+  async unregisterGuild(snowflake: Snowflake): Promise<Result<Guild>> {
+    if (!(await this.get(snowflake)))
+      return Result.err(GuildStatus.SnowflakeDoesNotExist);
 
-    await this.prisma.guild.update({
+    const guild = await this.prisma.guild.delete({ where: { snowflake } });
+
+    return Result.ok(guild);
+  }
+
+  async updateContactEmail(
+    snowflake: Snowflake,
+    contactEmail: string,
+  ): Promise<Result<Guild>> {
+    if (!(await this.get(snowflake)))
+      return Result.err(GuildStatus.SnowflakeDoesNotExist);
+
+    const guild = await this.prisma.guild.update({
       where: { snowflake },
       data: { contactEmail },
     });
-    return GuildStatus.Success;
+
+    return Result.ok(guild);
   }
 }

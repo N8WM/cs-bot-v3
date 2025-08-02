@@ -3,6 +3,8 @@ declare global {
     export interface ProcessEnv {
       TOKEN?: string;
       DEV_GUILD_IDS?: string;
+      GMAIL_ADDRESS?: string;
+      GMAIL_PASSWORD?: string;
       DATABASE_URL?: string;
       SHADOW_DATABASE_URL?: string;
     }
