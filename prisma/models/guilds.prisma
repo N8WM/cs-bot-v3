@@ -6,6 +6,8 @@ model Guild {
 
   verifySettings VerifySettings?
   verifiedUsers  User[]
+  topics         Topic[]
+  messages       Message[]
 }
 
 model VerifySettings {
