@@ -49,6 +49,8 @@ export class GuildService extends BaseService {
     if (!(await this.get(snowflake)))
       return Result.err(GuildStatus.SnowflakeDoesNotExist);
 
+    await this.prisma.user.deleteMany({ where: { guildSnowflake: snowflake} });
+    await this.prisma.verifySettings.delete( { where: { guildSnowflake: snowflake } });
     const guild = await this.prisma.guild.delete({ where: { snowflake } });
 
     return Result.ok(guild);
