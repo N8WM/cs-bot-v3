@@ -1,6 +1,7 @@
 model Topic {
   id             String   @id @default(cuid())
   guildSnowflake String
+  name           String
   summary        String   @db.Text
   createdAt      DateTime @default(now())
 
