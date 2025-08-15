@@ -9,7 +9,13 @@
     "build": "tsc && tsc-alias",
     "start": "node .",
     "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "db:up": "docker compose --profile local up -d db",
+    "db:down": "docker compose --profile local down",
+    "db:logs": "docker compose --profile local logs -f db",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy"
   },
   "repository": {
     "type": "git",

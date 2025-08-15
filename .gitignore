@@ -136,3 +136,11 @@ dist
 .pnp.*
 
 *_old/
+
+# local env files
+.env
+.env.*
+!.env.example
+
+# postgres volume
+pgdata/

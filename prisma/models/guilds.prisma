@@ -1,13 +1,12 @@
 model Guild {
-  snowflake    String   @id
-  contactEmail String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  verifySettings VerifySettings?
-  verifiedUsers  User[]
-  topics         Topic[]
+  snowflake      String          @id
+  contactEmail   String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
   messages       Message[]
+  topics         Topic[]
+  verifiedUsers  User[]
+  verifySettings VerifySettings?
 }
 
 model VerifySettings {
@@ -15,6 +14,5 @@ model VerifySettings {
   roleId         String
   suffix         String
   createdAt      DateTime @default(now())
-
-  guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
+  guild          Guild    @relation(fields: [guildSnowflake], references: [snowflake])
 }
