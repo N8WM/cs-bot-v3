@@ -19,3 +19,15 @@ model Message {
 
   @@id([guildSnowflake, channelSnowflake, messageSnowflake, topicId])
 }
+
+
+// INTROSPECTED: See `topic_embeddings` migration
+model topic_summary_embeddings_store {
+  embedding_uuid String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id             String
+  chunk_seq      Int
+  chunk          String
+  embedding      Unsupported("vector")
+
+  @@unique([id, chunk_seq])
+}
