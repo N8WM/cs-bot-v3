@@ -1,25 +1,37 @@
 model Topic {
-  id             String    @id @default(cuid())
+  id             String   @id @default(cuid())
   guildSnowflake String
   name           String
   summary        String
-  createdAt      DateTime  @default(now())
-  messages       Message[]
-  guild          Guild     @relation(fields: [guildSnowflake], references: [snowflake])
+  createdAt      DateTime @default(now())
+  guild          Guild    @relation(fields: [guildSnowflake], references: [snowflake])
+
+  TopicMessage TopicMessage[]
 }
 
 model Message {
+  id               String   @id @default(cuid())
   guildSnowflake   String
   channelSnowflake String
   messageSnowflake String
-  topicId          String
   createdAt        DateTime @default(now())
   guild            Guild    @relation(fields: [guildSnowflake], references: [snowflake])
-  topic            Topic    @relation(fields: [topicId], references: [id])
 
-  @@id([guildSnowflake, channelSnowflake, messageSnowflake, topicId])
+  TopicMessage TopicMessage[]
+
+  @@unique([guildSnowflake, channelSnowflake, messageSnowflake])
 }
 
+model TopicMessage {
+  id             String  @id @default(cuid())
+  topicId        String
+  messageId      String
+  relevanceScore Float
+  topic          Topic   @relation(fields: [topicId], references: [id])
+  message        Message @relation(fields: [messageId], references: [id])
+
+  @@unique([topicId, messageId])
+}
 
 // INTROSPECTED: See `topic_embeddings` migration
 model topic_summary_embeddings_store {

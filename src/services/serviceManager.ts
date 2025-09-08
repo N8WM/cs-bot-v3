@@ -4,11 +4,13 @@ import { PrismaClient } from "@prisma/client";
 import { GuildService } from "./guildService";
 import { UserService } from "./userService";
 import { VerifyService } from "./verifyService";
+import { TopicService } from "./topicService";
 
 export class ServiceManager {
   static guild: GuildService;
   static user: UserService;
   static verify: VerifyService;
+  static topicService: TopicService;
 
   static initialized = false;
 
@@ -21,6 +23,7 @@ export class ServiceManager {
     ServiceManager.guild = new GuildService(prisma);
     ServiceManager.user = new UserService(prisma);
     ServiceManager.verify = new VerifyService(prisma);
+    ServiceManager.topicService = new TopicService(prisma);
 
     ServiceManager.initialized = true;
   }

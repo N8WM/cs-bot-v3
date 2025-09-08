@@ -1,5 +1,7 @@
 import { Message } from "@prisma/client";
+import { getRelatedTopics } from "@prisma/client/sql";
 import { BaseService } from "./baseService";
+import { LLMTransactions } from "@llm";
 
 export class TopicService extends BaseService {
   async get(id: string) {
@@ -17,7 +19,7 @@ export class TopicService extends BaseService {
         guildSnowflake,
         name,
         summary
-      },
+      }
     });
 
     const msgData = messages.map((m) => ({
@@ -30,5 +32,23 @@ export class TopicService extends BaseService {
     await this.prisma.message.createMany({ data: msgData });
 
     return topic;
+  }
+
+  async getAnswer(query: string) {
+    const related = await this.prisma.$queryRawTyped(getRelatedTopics(query));
+    const topicIds = related.map((r) => r.id!);
+    
+    const topicsWithMessages = await this.prisma.topic.findMany({
+      where: { id: { in: topicIds } },
+      include: {
+        TopicMessage: {
+          include: {
+            message: true
+          }
+        }
+      }
+    });
+
+    return await LLMTransactions.getTopicBasedAnswer(query, topicsWithMessages);
   }
 }

@@ -23,7 +23,12 @@ services:
         condition: service_healthy
     environment:
       PGAI_VECTORIZER_WORKER_DB_URL: postgres://postgres:postgres@db:5432/postgres
-    entrypoint: [ "python", "-m", "pgai", "install", "-d", "postgres://postgres:postgres@db:5432/postgres" ]
+    entrypoint:
+      - sh
+      - -c
+      - |
+        python -m pgai install -d postgres://postgres:postgres@db:5432/postgres &&
+        python -m pgai install -d postgres://postgres:postgres@db:5432/template1
     restart: "no"
 
   vectorizer-worker:
@@ -40,6 +45,8 @@ services:
   ollama:
     image: ollama/ollama
     restart: unless-stopped
+    ports:
+      - "11434:11434"
 
 volumes:
   pgdata:

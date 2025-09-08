@@ -4,15 +4,32 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "paths": {
-      "@app/*": ["app/*"],
-      "@registry": ["registry/index.ts"],
-      "@services": ["services/index.ts"],
-      "@util/*": ["util/*"],
-      "@config": ["app/config.ts"],
-      "@logger": ["logger.ts"],
+      "@app/*": [
+        "app/*"
+      ],
+      "@registry": [
+        "registry/index.ts"
+      ],
+      "@services": [
+        "services/index.ts"
+      ],
+      "@llm": [
+        "llm/index.ts"
+      ],
+      "@util/*": [
+        "util/*"
+      ],
+      "@config": [
+        "app/config.ts"
+      ],
+      "@logger": [
+        "logger.ts"
+      ],
     },
     "target": "ES2022",
-    "lib": ["ESNEXT"],
+    "lib": [
+      "ESNEXT"
+    ],
     "module": "CommonJS",
     "sourceMap": true,
     "moduleResolution": "Node",
@@ -25,8 +42,18 @@
     "strictNullChecks": true,
     "resolveJsonModule": true,
     "outDir": "dist",
-    "typeRoots": ["./node_modules/@types", "./node_modules/@discordjs/typings"]
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@discordjs/typings"
+    ]
   },
-  "include": ["src", "__tests__", "*.d.ts"],
-  "exclude": ["node_modules", "src/_*_old"]
+  "include": [
+    "src",
+    "__tests__",
+    "*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/_*_old"
+  ]
 }
