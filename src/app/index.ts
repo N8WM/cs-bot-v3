@@ -6,13 +6,13 @@ import { Logger } from "@logger";
 import { Registry } from "@registry";
 import { PrismaClient } from "@prisma/client";
 import { ServiceManager } from "@services";
-import { LLMProvider } from "@llm";
+import { InterfaceManager, LLMSession } from "@llm";
 
-// Instantiate Prisma
+// Instantiate database client
 const prisma = new PrismaClient();
 
 async function main() {
-  // Instantiate Client
+  // Instantiate discord client
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -24,6 +24,13 @@ async function main() {
     ]
   });
 
+  // Pull the LLM model
+  await LLMSession.pullModel();
+
+  // Initialize managers
+  InterfaceManager.init(client);
+  ServiceManager.init(prisma);
+
   // Set up Registry
   await Registry.init({
     client,
@@ -33,27 +40,8 @@ async function main() {
     devGuildIds: config.devGuildIds
   });
 
-  // Set up services
-  ServiceManager.init(prisma);
-
-  // Set up LLM Provider
-  await LLMProvider.init();
-
   // Dispatch application
   await client.login(config.token);
-
-  // Wait for everything to fully initialize, then test getAnswer
-  setTimeout(async () => {
-    const testQuery = "How do I deploy my Discord bot?";
-    console.log(`\n=== Testing getAnswer with query: "${testQuery}" ===`);
-    try {
-      const answer = await ServiceManager.topicService.getAnswer(testQuery);
-      console.log("Answer:", answer);
-    } catch (error) {
-      console.error("Error testing getAnswer:", error);
-    }
-    console.log("=== End test ===\n");
-  }, 5000); // Wait 5 seconds for full initialization
 }
 
 main()
