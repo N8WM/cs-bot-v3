@@ -7,7 +7,7 @@ import { BaseService } from "./baseService";
 export enum GuildStatus {
   Success = "Success",
   SnowflakeAlreadyExists = "This server is already registered",
-  SnowflakeDoesNotExist = "This server is not registered",
+  SnowflakeDoesNotExist = "This server is not registered"
 }
 
 export class GuildService extends BaseService {
@@ -17,12 +17,12 @@ export class GuildService extends BaseService {
 
   async refreshGuilds(snowflakes: Snowflake[]) {
     await this.prisma.guild.deleteMany({
-      where: { snowflake: { notIn: snowflakes } },
+      where: { snowflake: { notIn: snowflakes } }
     });
 
     const update = await this.prisma.guild.updateMany({
       where: { snowflake: { in: snowflakes } },
-      data: { updatedAt: new Date() },
+      data: { updatedAt: new Date() }
     });
 
     return update.count;
@@ -30,7 +30,7 @@ export class GuildService extends BaseService {
 
   async registerGuild(
     snowflake: Snowflake,
-    contactEmail: string,
+    contactEmail: string
   ): Promise<Result<Guild>> {
     if (await this.get(snowflake))
       return Result.err(GuildStatus.SnowflakeAlreadyExists);
@@ -38,8 +38,8 @@ export class GuildService extends BaseService {
     const guild = await this.prisma.guild.create({
       data: {
         snowflake,
-        contactEmail,
-      },
+        contactEmail
+      }
     });
 
     return Result.ok(guild);
@@ -49,8 +49,8 @@ export class GuildService extends BaseService {
     if (!(await this.get(snowflake)))
       return Result.err(GuildStatus.SnowflakeDoesNotExist);
 
-    await this.prisma.user.deleteMany({ where: { guildSnowflake: snowflake} });
-    await this.prisma.verifySettings.delete( { where: { guildSnowflake: snowflake } });
+    await this.prisma.user.deleteMany({ where: { guildSnowflake: snowflake } });
+    await this.prisma.verifySettings.delete({ where: { guildSnowflake: snowflake } });
     const guild = await this.prisma.guild.delete({ where: { snowflake } });
 
     return Result.ok(guild);
@@ -58,14 +58,14 @@ export class GuildService extends BaseService {
 
   async updateContactEmail(
     snowflake: Snowflake,
-    contactEmail: string,
+    contactEmail: string
   ): Promise<Result<Guild>> {
     if (!(await this.get(snowflake)))
       return Result.err(GuildStatus.SnowflakeDoesNotExist);
 
     const guild = await this.prisma.guild.update({
       where: { snowflake },
-      data: { contactEmail },
+      data: { contactEmail }
     });
 
     return Result.ok(guild);

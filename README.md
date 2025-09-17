@@ -1,9 +1,12 @@
-# cs-bot-v3
-
 ## Setup
 
 The following instructions explain how to set up and run the development
-environment with a local Postgres database. Requires Docker.
+environment with a local Postgres database. Requires a system with Docker and Ollama set up, and a discord bot token.
+
+### 0. Install Ollama if you haven't already
+
+Visit [https://ollama.com/download](https://ollama.com/download) to install and set up Ollama.  
+To check if it's working, visit [http://localhost:11434](http://localhost:11434) in your browser; it should say something like `Ollama is running`.
 
 ### 1. Clone and initialize
 
@@ -26,13 +29,16 @@ GMAIL_PASSWORD=change_me
 
 # Prisma
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/postgres
+
+# Docker <-> Ollama
+OLLAMA_HOST=http://host.docker.internal:11434
 ```
 
-### 3. Set up the local database (requires Docker)
+### 3. Spin up database tools (requires Docker)
 
 ```sh
-npm run db:up
-npm run prisma:deploy
+npm run db:up  # "npm run db:down"" to spin down
+npm run prisma:migrate
 ```
 
 ### 4. Run

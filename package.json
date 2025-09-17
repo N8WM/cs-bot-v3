@@ -8,17 +8,16 @@
     "dev": "tsx watch src/app/index.ts",
     "build": "tsc && tsc-alias",
     "start": "node .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
     "dc:up": "docker compose up -d",
+    "dc:reup": "docker compose down -v && docker compose up -d",
     "dc:down": "docker compose down",
     "dc:logs": "docker compose logs -f db",
     "dc:logs:db": "docker compose logs -f db",
     "dc:logs:vector": "docker compose logs -f vectorizer-worker",
     "dc:logs:ollama": "docker compose logs -f ollama",
     "prisma:generate": "npx prisma generate",
-    "prisma:migrate": "npx prisma migrate dev",
-    "prisma:deploy": "npx prisma migrate deploy && npx prisma generate"
+    "prisma:migrate": "npx prisma migrate dev && npx prisma generate --sql",
+    "prisma:deploy": "npx prisma migrate deploy && npx prisma generate && npx prisma generate --sql"
   },
   "repository": {
     "type": "git",
@@ -31,7 +30,7 @@
   },
   "homepage": "https://github.com/N8WM/cs-bot-v3#readme",
   "dependencies": {
-    "@prisma/client": "^6.13.0",
+    "@prisma/client": "^6.16.2",
     "discord.js": "^14.20.0",
     "dotenv": "^16.5.0",
     "moment": "^2.30.1",
@@ -43,17 +42,11 @@
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^5.3.1",
-    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
     "eslint": "^9.29.0",
-    "jest": "^30.0.5",
-    "prisma": "^6.12.0",
-    "ts-jest": "^29.4.0",
+    "prisma": "^6.16.2",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.3",
     "typescript-eslint": "^8.42.0"
-  },
-  "prisma": {
-    "schema": "./prisma"
   }
 }

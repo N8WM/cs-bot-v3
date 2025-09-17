@@ -1,3 +1,10 @@
+CREATE TABLE "Topic" (
+    "id" TEXT NOT NULL,
+    "summary" TEXT NOT NULL,
+
+    CONSTRAINT "Topic_pkey" PRIMARY KEY ("id")
+);
+
 SELECT ai.create_vectorizer(
   '"Topic"'::regclass,
   loading => ai.loading_column('summary'),

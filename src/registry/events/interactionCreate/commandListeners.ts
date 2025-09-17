@@ -8,7 +8,7 @@ import { CommandHandler } from "../../command";
 
 const handler: EventHandler<Events.InteractionCreate> = {
   async execute(interaction) {
-    if (!interaction.isCommand()) return;
+    if (!(interaction.isCommand() || interaction.isContextMenuCommand())) return;
 
     const command = Registry.commands.get(interaction.commandName)!;
     const handler = command.handler as CommandHandler<
@@ -16,7 +16,7 @@ const handler: EventHandler<Events.InteractionCreate> = {
     >;
 
     Logger.debug(
-      `[${handler.data.name}] command from ${interaction.user.username} <${interaction.user.id}>`,
+      `[${handler.data.name}] command from ${interaction.user.username} <${interaction.user.id}>`
     );
 
     handler
@@ -24,17 +24,19 @@ const handler: EventHandler<Events.InteractionCreate> = {
       .catch(async (e) => {
         Logger.error(`Command Error (${handler.data.name}): ${e}`);
 
+        if (e instanceof Error) console.error(e.stack);
+
         const response: InteractionReplyOptions = {
           content: "Yikes! There was an error processing your request.",
-          flags: interaction.ephemeral ? [MessageFlags.Ephemeral] : [],
+          flags: interaction.ephemeral ? [MessageFlags.Ephemeral] : []
         };
 
         if (interaction.deferred || interaction.replied)
-          await interaction.editReply({content: response.content});
+          await interaction.editReply({ content: response.content });
         else
           await interaction.reply(response);
       });
-  },
+  }
 };
 
 export default handler;

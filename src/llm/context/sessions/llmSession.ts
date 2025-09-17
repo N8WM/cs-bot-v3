@@ -14,10 +14,13 @@ export class LLMSession {
     message: Message,
     options: { flush: true; tools?: Tool[] }
   ): Promise<ChatResponse>;
-
   async message(
     message: Message,
-    options?: { flush?: false }
+    options?: { flush?: true }
+  ): Promise<ChatResponse>;
+  async message(
+    message: Message,
+    options?: { flush: false }
   ): Promise<undefined>;
 
   async message(
@@ -40,11 +43,18 @@ export class LLMSession {
     return response;
   }
 
+  async forget() {
+    this._messages.length = 0;
+  }
+
   static async chat(
     messages: Message[],
     tools?: Tool[],
     options?: Partial<Options>
   ) {
+    Logger.debug(`Sending message to LLM Model "${LLMSession.model}"...`);
+    Logger.debug(`Messages:\n${messages.at(-1)!.content}`);
+    Logger.debug(`Tools:\n${JSON.stringify(tools)}`);
     const response = await ollama.chat(
       {
         model: LLMSession.model,
@@ -55,6 +65,8 @@ export class LLMSession {
         options
       }
     );
+    Logger.debug(`Response:\n${response.message.content}`);
+    Logger.debug(`Tool calls:\n${JSON.stringify(response.message.tool_calls)}`);
 
     return response;
   }

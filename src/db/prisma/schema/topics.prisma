@@ -1,0 +1,37 @@
+model Topic {
+  id             String   @id @default(cuid())
+  guildSnowflake String
+  summary        String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  guild    Guild     @relation(fields: [guildSnowflake], references: [snowflake], onDelete: Cascade)
+  messages Message[]
+}
+
+model Message {
+  messageSnowflake String
+  guildSnowflake   String
+  channelSnowflake String
+  topicId          String
+  content          String
+  authorSnowflake  String
+  timestamp        DateTime
+  createdAt        DateTime @default(now())
+
+  guild Guild @relation(fields: [guildSnowflake], references: [snowflake])
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([messageSnowflake, topicId])
+}
+
+// INTROSPECTED: See `topic_embeddings` migration
+model topic_summary_embeddings_store {
+  embedding_uuid String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id             String
+  chunk_seq      Int
+  chunk          String
+  embedding      Unsupported("vector")
+
+  @@unique([id, chunk_seq])
+}

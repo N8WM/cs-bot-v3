@@ -4,7 +4,7 @@ WITH q AS (
   SELECT ai.ollama_embed(
     'nomic-embed-text',
     COALESCE($1::text, 'placeholder'),
-    host => 'http://ollama:11434'
+    host => current_setting('app.ollama_host', true)
   ) AS v
 )
 SELECT

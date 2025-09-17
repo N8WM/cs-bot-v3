@@ -7,8 +7,8 @@ import { Result } from "@util/result";
 
 export type UserMessageOptions
   = { discordMsg: DiscordMessage }
-    | { databaseMsg: DBMessage }
-    | { discordMsg: DiscordMessage; databaseMsg: DBMessage };
+  | { databaseMsg: DBMessage }
+  | { discordMsg: DiscordMessage; databaseMsg: DBMessage };
 
 export class UserMessage {
   private _discordMsg?: DiscordMessage;
@@ -123,17 +123,17 @@ export class UserMessage {
 }
 
 const fromDiscordMsg = (discordMessage: DiscordMessage): DBMessage => ({
-  id: "0",
   guildSnowflake: discordMessage.guildId!,
   channelSnowflake: discordMessage.channelId,
   messageSnowflake: discordMessage.id,
   authorSnowflake: discordMessage.author.id,
   content: discordMessage.content,
   timestamp: discordMessage.createdAt,
-  createdAt: new Date()
+  createdAt: new Date(),
+  topicId: ""
 });
 
-const serializeMessage = (message: DBMessage) => create({
+export const msgJSON = (message: DBMessage) => ({
   Message: {
     "@id": message.messageSnowflake,
     "@timestamp": message.timestamp.toISOString(),
@@ -152,18 +152,22 @@ const serializeMessage = (message: DBMessage) => create({
     },
     "Channel": {
       "@id": message.channelSnowflake,
-      "@inlineMention": {
+      "InlineMention": {
         $: utilitySerializer.channelMention(message.channelSnowflake)
       }
     },
     "Content": { $: utilitySerializer.escapeCData(message.content) }
   }
-}).end({ prettyPrint: true, headless: true });
+});
+
+const serializeMessage = (message: DBMessage) => create(
+  msgJSON(message)
+).end({ prettyPrint: true, headless: true });
 
 const eofMarker = (eof: boolean, temporalDirection: "before" | "after") => eof
   ? create({
-      EOF: {
-        "@side": temporalDirection
-      }
-    }).end({ prettyPrint: true, headless: true })
+    EOF: {
+      "@side": temporalDirection
+    }
+  }).end({ prettyPrint: true, headless: true })
   : "";

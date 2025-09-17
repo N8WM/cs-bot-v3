@@ -64,7 +64,7 @@ export class RecordTools {
     };
   }
 
-  static overwriteExistingTopicToolBuilder(ids: string[]): Tool {
+  static overwriteExistingTopic(ids: string[]): Tool {
     return {
       type: "function",
       function: {

@@ -9,15 +9,15 @@ export enum UserStatus {
   SnowflakeAlreadyExists = "This account is already verified under a different email",
   EmailAlreadyExists = "This email has already been used to verify a different user",
   UserAlreadyExists = "This account is already verified",
-  UserDoesNotExist = "This account has not been verified yet",
+  UserDoesNotExist = "This account has not been verified yet"
 }
 
 export class UserService extends BaseService {
   async get(userSnowflake: Snowflake, guildSnowflake: Snowflake) {
     return await this.prisma.user.findUnique({
       where: {
-        userSnowflake_guildSnowflake: { userSnowflake, guildSnowflake },
-      },
+        userSnowflake_guildSnowflake: { userSnowflake, guildSnowflake }
+      }
     });
   }
 
@@ -28,11 +28,11 @@ export class UserService extends BaseService {
   async verifyUser(
     userSnowflake: Snowflake,
     guildSnowflake: Snowflake,
-    email: string,
+    email: string
   ): Promise<Result<User>> {
     const alreadySnowflake = await this.get(userSnowflake, guildSnowflake);
     const alreadyEmail = await this.prisma.user.findUnique({
-      where: { guildSnowflake_email: { guildSnowflake, email } },
+      where: { guildSnowflake_email: { guildSnowflake, email } }
     });
 
     if (alreadySnowflake && alreadyEmail) return Result.err(UserStatus.UserAlreadyExists);
@@ -43,8 +43,8 @@ export class UserService extends BaseService {
       data: {
         userSnowflake,
         guildSnowflake,
-        email,
-      },
+        email
+      }
     });
 
     return Result.ok(user);
@@ -52,15 +52,15 @@ export class UserService extends BaseService {
 
   async unverifyUser(
     userSnowflake: Snowflake,
-    guildSnowflake: Snowflake,
+    guildSnowflake: Snowflake
   ): Promise<Result<User>> {
     const user = await this.get(userSnowflake, guildSnowflake);
     if (!user) return Result.err(UserStatus.UserDoesNotExist);
 
     const deleted = await this.prisma.user.delete({
       where: {
-        userSnowflake_guildSnowflake: { userSnowflake, guildSnowflake },
-      },
+        userSnowflake_guildSnowflake: { userSnowflake, guildSnowflake }
+      }
     });
 
     return Result.ok(deleted);

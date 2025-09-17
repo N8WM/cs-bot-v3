@@ -1,3 +1,3 @@
-export class RecallPrompt {
-  async execute() { }
+export class RecallSequence {
+  static async execute() { }
 }

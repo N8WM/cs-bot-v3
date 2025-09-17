@@ -10,7 +10,7 @@ export class ServiceManager {
   static guild: GuildService;
   static user: UserService;
   static verify: VerifyService;
-  static topicService: TopicService;
+  static topic: TopicService;
 
   static initialized = false;
 
@@ -23,7 +23,7 @@ export class ServiceManager {
     ServiceManager.guild = new GuildService(prisma);
     ServiceManager.user = new UserService(prisma);
     ServiceManager.verify = new VerifyService(prisma);
-    ServiceManager.topicService = new TopicService(prisma);
+    ServiceManager.topic = new TopicService(prisma);
 
     ServiceManager.initialized = true;
   }
