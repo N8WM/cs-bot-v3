@@ -1,8 +1,9 @@
 model Guild {
-  snowflake      String          @id
-  contactEmail   String
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  snowflake    String   @id
+  contactEmail String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   messages       Message[]
   topics         Topic[]
   verifiedUsers  User[]
@@ -14,5 +15,6 @@ model VerifySettings {
   roleId         String
   suffix         String
   createdAt      DateTime @default(now())
-  guild          Guild    @relation(fields: [guildSnowflake], references: [snowflake])
+
+  guild Guild @relation(fields: [guildSnowflake], references: [snowflake], onDelete: Cascade)
 }

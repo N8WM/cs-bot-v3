@@ -8,13 +8,13 @@ export enum VerifyStatus {
   Success = "Success",
   GuildSnowflakeDoesNotExist = "This server has not been registered.",
   VerificationDisabled = "This server does not have verification enabled",
-  VerificationEnabled = "This server already has verification enabled",
+  VerificationEnabled = "This server already has verification enabled"
 }
 
 export class VerifyService extends BaseService {
   async get(guildSnowflake: Snowflake) {
     return await this.prisma.verifySettings.findUnique({
-      where: { guildSnowflake },
+      where: { guildSnowflake }
     });
   }
 
@@ -25,7 +25,7 @@ export class VerifyService extends BaseService {
   async enable(
     guildSnowflake: Snowflake,
     roleId: string,
-    suffix: string,
+    suffix: string
   ): Promise<Result<VerifySettings>> {
     const existing = await this.get(guildSnowflake);
 
@@ -33,7 +33,7 @@ export class VerifyService extends BaseService {
       await this.prisma.verifySettings.delete({ where: { guildSnowflake } });
 
     const registered = await this.prisma.guild.findUnique({
-      where: { snowflake: guildSnowflake },
+      where: { snowflake: guildSnowflake }
     });
 
     if (registered === null)
@@ -43,8 +43,8 @@ export class VerifyService extends BaseService {
       data: {
         guildSnowflake,
         roleId,
-        suffix,
-      },
+        suffix
+      }
     });
 
     return Result.ok(settings);
@@ -56,7 +56,7 @@ export class VerifyService extends BaseService {
       return Result.err(VerifyStatus.VerificationDisabled);
 
     const settings = await this.prisma.verifySettings.delete({
-      where: { guildSnowflake },
+      where: { guildSnowflake }
     });
     await this.prisma.user.deleteMany({ where: { guildSnowflake } });
 

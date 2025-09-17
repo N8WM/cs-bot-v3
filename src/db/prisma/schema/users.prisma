@@ -3,7 +3,8 @@ model User {
   guildSnowflake String
   email          String
   createdAt      DateTime @default(now())
-  guild          Guild    @relation(fields: [guildSnowflake], references: [snowflake])
+
+  guild Guild @relation(fields: [guildSnowflake], references: [snowflake], onDelete: Cascade)
 
   @@id([userSnowflake, guildSnowflake])
   @@unique([guildSnowflake, email])
