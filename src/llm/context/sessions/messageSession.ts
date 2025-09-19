@@ -51,13 +51,15 @@ export class MessageSession {
   }
 
   merge(additionalMsgs: DBMessage[]) {
-    additionalMsgs.forEach(
-      (m) => this._messages.set(
-        m.messageSnowflake,
-        new UserMessage({ databaseMsg: m })
-      ),
-      this
-    );
+    additionalMsgs
+      .filter((m) => !this._messages.has(m.messageSnowflake))
+      .forEach(
+        (m) => this._messages.set(
+          m.messageSnowflake,
+          new UserMessage({ databaseMsg: m })
+        ),
+        this
+      );
   }
 
   serialized() {

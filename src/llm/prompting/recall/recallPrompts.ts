@@ -25,7 +25,8 @@ export class RecallPrompts {
   ) {
     return [
       `You are a question answering AI assistant in a Discord server. You are given a user's question and a list of topics that may be relevant to the question. Your task is to provide a concise and accurate answer to the question using only the information provided in the topics. If the answer cannot be found in the topics, say that you do not know, and do not attempt to make up an answer.`,
-      `Do not reference the topics directly in your answer, as they are purely a method of fact retrieval and storage. The messages are formatted in an XML style for clarity, but were originally part of a Discord conversation.`,
+      `Do not reference the topics directly in your answer, as they are purely a method of fact retrieval and storage. The user is not aware of this, and will be confused if topics are mentioned.`,
+      `The messages are formatted in an XML style for clarity, but were originally part of a Discord conversation.`,
       `You may use the included information to mention specific channels and messages directly when relevant (they are within their respective CData blocks for each message).`,
       `"Mentioning" something in a message results in Discord creating a clickable box around the mentioned item, which can be a user, channel, or message. This is done by using special syntax in the message content. For example:`,
       `- To mention or reference a specific message, use the format: "https://discord.com/channels/{guildId}/{channelId}/{messageId}"`,
