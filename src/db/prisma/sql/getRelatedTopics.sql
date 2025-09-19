@@ -1,4 +1,5 @@
 -- @param {String} $1:query
+-- @param {String} $2:guildSnowflake
 
 WITH q AS (
   SELECT ai.ollama_embed(
@@ -8,9 +9,12 @@ WITH q AS (
   ) AS v
 )
 SELECT
-  t.id as id,
-  t.chunk as summary,
-  t.embedding <=> q.v as distance
-FROM "topic_summary_embeddings" t, q
+  tse.id AS id,
+  tse.chunk AS summary,
+  tse.embedding <=> q.v AS distance
+FROM "topic_summary_embeddings" AS tse
+JOIN "Topic" AS t ON t.id = tse.id
+CROSS JOIN q
+WHERE t."guildSnowflake" = $2::text
 ORDER BY distance
 LIMIT 10

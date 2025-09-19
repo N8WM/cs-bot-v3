@@ -1,8 +1,9 @@
-CREATE TABLE "Topic" (
-    "id" TEXT NOT NULL,
-    "summary" TEXT NOT NULL,
+CREATE TABLE "public"."Topic" (
+  "id" TEXT NOT NULL,
+  "guildSnowflake" TEXT NOT NULL,
+  "summary" TEXT NOT NULL,
 
-    CONSTRAINT "Topic_pkey" PRIMARY KEY ("id")
+  CONSTRAINT "Topic_pkey" PRIMARY KEY ("id")
 );
 
 SELECT ai.create_vectorizer(

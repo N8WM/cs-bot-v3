@@ -11,20 +11,26 @@ export class MessageSession {
   constructor(initialDiscordMsg: DiscordMessage) {
     this._initialMessage = new UserMessage({ discordMsg: initialDiscordMsg });
     this._messages = new Collection();
+
+    this._messages.set(
+      this._initialMessage.databaseMsg.messageSnowflake,
+      this._initialMessage
+    );
   }
 
   async expand(
     dir: "before" | "after" | "around",
     limit: number = 10
   ) {
-    const result = await this._initialMessage.fetch(dir, limit);
+    const boundMsg = dir === "around"
+      ? this._initialMessage
+      : dir === "before"
+        ? this._messages.first()!
+        : this._messages.last()!;
+
+    const result = await boundMsg.fetch(dir, limit);
 
     if (!result.ok) return result;
-
-    this._messages.set(
-      this._initialMessage.databaseMsg.messageSnowflake,
-      this._initialMessage
-    );
 
     result.value.forEach((m, id) => this._messages.set(id, m), this);
 

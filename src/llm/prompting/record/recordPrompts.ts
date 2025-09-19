@@ -49,7 +49,7 @@ export class RecordPrompts {
 
   static summarizationPrompt(initiatedMessage: string, messages: string) {
     return [
-      `The following messages are an excerpt from a Discord conversation. Your task is to generate a concise summary of the main topic discussed in the conversation. The summary should be brief, capturing the essence of the discussion in a few sentences. Focus on the key points and avoid referencing specific messages or users. Only output the summary without any additional commentary. The summary text will be used in its entirety as the summary.`,
+      `The following messages are an excerpt from a Discord conversation. Your task is to generate a concise summary of the main topic discussed in the conversation, in the form of one or more factual statements. The summary should be brief, capturing the essence of the discussion in a few sentences. Focus on the key points and avoid referencing specific messages or who sent them. Only output the summary without any additional commentary. The summary text will be used in its entirety as the summary.`,
       `The message identified as the "initiated message" is particularly important, as it should be used to indicate the topic for the entire conversation. Ensure that the summary accurately reflects the topic introduced by this message.`,
       ``,
       `Initiated Message:`,

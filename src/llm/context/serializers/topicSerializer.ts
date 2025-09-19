@@ -3,15 +3,19 @@ import { create } from "xmlbuilder2";
 
 import { Topic, Message } from "@prisma/client";
 import { escapeCData } from "./utilitySerializer";
-import { msgJSON } from "./messageSerializer";
+import { msgJSON, UserMessage } from "./messageSerializer";
+
+export type TopicWithMessages = Topic & { messages: Message[] };
 
 export class UserTopic {
-  private _databaseTopic: Topic;
+  private _databaseTopic: Topic | TopicWithMessages;
   private _serialized?: string;
   private _databaseMsgs?: Message[];
 
-  constructor(databaseTopic: Topic) {
+  constructor(databaseTopic: Topic | TopicWithMessages) {
     this._databaseTopic = databaseTopic;
+    if ("messages" in databaseTopic)
+      this._databaseMsgs = databaseTopic.messages;
   }
 
   get databaseTopic() {
@@ -30,10 +34,6 @@ export class UserTopic {
       );
 
     return this._serialized;
-  }
-
-  set databaseMsgs(databaseMsgs: Message[] | undefined) {
-    this._databaseMsgs = databaseMsgs;
   }
 
   get databaseMsgs() {
@@ -57,7 +57,9 @@ const serializeTopicWithMsgs = (topic: Topic, messages: Message[]) => create({
     "@id": topic.id,
     "Summary": { $: escapeCData(topic.summary) },
     "Messages": {
-      Message: messages.map((m) => msgJSON(m).Message)
+      Message: messages
+        .toSorted(UserMessage.dbComparator)
+        .map((m) => msgJSON(m).Message)
     }
   }
 }).end({ prettyPrint: true, headless: true });

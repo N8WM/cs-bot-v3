@@ -7,8 +7,8 @@ import { Result } from "@util/result";
 
 export type UserMessageOptions
   = { discordMsg: DiscordMessage }
-  | { databaseMsg: DBMessage }
-  | { discordMsg: DiscordMessage; databaseMsg: DBMessage };
+    | { databaseMsg: DBMessage }
+    | { discordMsg: DiscordMessage; databaseMsg: DBMessage };
 
 export class UserMessage {
   private _discordMsg?: DiscordMessage;
@@ -18,7 +18,10 @@ export class UserMessage {
   private _EOFBefore: boolean = false;
   private _EOFAfter: boolean = false;
 
-  private static readonly comparator = (a: UserMessage, b: UserMessage) =>
+  static readonly dbComparator = (a: DBMessage, b: DBMessage) =>
+    a.timestamp.getTime() - b.timestamp.getTime();
+
+  static readonly umComparator = (a: UserMessage, b: UserMessage) =>
     a._databaseMsg.timestamp.getTime() - b._databaseMsg.timestamp.getTime();
 
   constructor(options: UserMessageOptions) {
@@ -102,7 +105,7 @@ export class UserMessage {
       return userMsgResult;
     }
 
-    const messages = userMsgResult.value.sorted(UserMessage.comparator);
+    const messages = userMsgResult.value.sorted(UserMessage.umComparator);
 
     if (temporalDirection !== "after") messages.first()!.checkEOF(temporalDirection);
     if (temporalDirection !== "before") messages.last()!.checkEOF(temporalDirection);
@@ -112,7 +115,7 @@ export class UserMessage {
 
   static joinSerialized(messages: Collection<Snowflake, UserMessage>) {
     return messages
-      .sorted(UserMessage.comparator)
+      .sorted(UserMessage.umComparator)
       .map((m) => m.serialized).join("\n\n");
   }
 
@@ -166,8 +169,8 @@ const serializeMessage = (message: DBMessage) => create(
 
 const eofMarker = (eof: boolean, temporalDirection: "before" | "after") => eof
   ? create({
-    EOF: {
-      "@side": temporalDirection
-    }
-  }).end({ prettyPrint: true, headless: true })
+      EOF: {
+        "@side": temporalDirection
+      }
+    }).end({ prettyPrint: true, headless: true })
   : "";

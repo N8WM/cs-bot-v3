@@ -8,14 +8,22 @@ import { MessageSession } from "./messageSession";
 
 export class TopicSession {
   private _topics: Collection<string, UserTopic>;
+  private _guildSnowflake: string;
   private _messageSession?: MessageSession;
 
   private _summary?: string;
   private _existingTopicId?: string;
 
-  constructor(messageSession?: MessageSession) {
+  constructor(options: { guildSnowflake: string } | { messageSession: MessageSession }) {
     this._topics = new Collection();
-    this._messageSession = messageSession;
+
+    this._guildSnowflake = "guildSnowflake" in options
+      ? options.guildSnowflake
+      : options.messageSession.initialMessage.databaseMsg.guildSnowflake;
+
+    this._messageSession = "messageSession" in options
+      ? options.messageSession
+      : undefined;
   }
 
   get topics() {
@@ -40,14 +48,28 @@ export class TopicSession {
 
   async createNewTopic() {
     return await ServiceManager.topic.newTopic(
-      this._messageSession!.initialMessage.databaseMsg.guildSnowflake,
+      this._guildSnowflake,
       this._summary!,
       this._messageSession!.messages.map((m) => m.databaseMsg)
     );
   }
 
   async findSimilarTopics() {
-    const databaseTopics = await ServiceManager.topic.getRelatedTopics(this._summary!);
+    const databaseTopics = await ServiceManager.topic.getRelatedTopics(
+      this._summary!,
+      this._guildSnowflake
+    );
+
+    databaseTopics.forEach((t) => {
+      this._topics.set(t.id, new UserTopic(t));
+    });
+  }
+
+  async findAnsweringTopics(question: string) {
+    const databaseTopics = await ServiceManager.topic.getRelatedTopicsWithMessages(
+      question,
+      this._guildSnowflake
+    );
 
     databaseTopics.forEach((t) => {
       this._topics.set(t.id, new UserTopic(t));

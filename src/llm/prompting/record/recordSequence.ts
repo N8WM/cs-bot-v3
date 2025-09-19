@@ -15,7 +15,7 @@ export class RecordSequence {
     loopMax: number = 15
   ) {
     const messageSession = new MessageSession(discordMessage);
-    const topicSession = new TopicSession(messageSession);
+    const topicSession = new TopicSession({ messageSession });
     const llmSession = new LLMSession();
 
     // Initial prompt

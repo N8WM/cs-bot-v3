@@ -7,6 +7,8 @@ model Topic {
 
   guild    Guild     @relation(fields: [guildSnowflake], references: [snowflake], onDelete: Cascade)
   messages Message[]
+
+  topic_summary_embeddings_store topic_summary_embeddings_store[]
 }
 
 model Message {
@@ -32,6 +34,8 @@ model topic_summary_embeddings_store {
   chunk_seq      Int
   chunk          String
   embedding      Unsupported("vector")
+
+  topic Topic @relation(fields: [id], references: [id], onDelete: Cascade)
 
   @@unique([id, chunk_seq])
 }

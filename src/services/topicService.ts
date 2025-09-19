@@ -81,8 +81,8 @@ export class TopicService extends BaseService {
     });
   }
 
-  async getRelatedTopics(query: string) {
-    const related = await this.prisma.$queryRawTyped(getRelatedTopics(query));
+  async getRelatedTopics(query: string, guildSnowflake: string) {
+    const related = await this.prisma.$queryRawTyped(getRelatedTopics(query, guildSnowflake));
     const topicIds = related.map((r) => r.id!);
 
     return await this.prisma.topic.findMany({
@@ -90,17 +90,13 @@ export class TopicService extends BaseService {
     });
   }
 
-  async getAnswer(query: string) {
-    const related = await this.prisma.$queryRawTyped(getRelatedTopics(query));
+  async getRelatedTopicsWithMessages(query: string, guildSnowflake: string) {
+    const related = await this.prisma.$queryRawTyped(getRelatedTopics(query, guildSnowflake));
     const topicIds = related.map((r) => r.id!);
 
-    const topicsWithMessages = await this.prisma.topic.findMany({
+    return await this.prisma.topic.findMany({
       where: { id: { in: topicIds } },
       include: { messages: true }
     });
-
-    // return await LLMTransactions.getTopicBasedAnswer(query, topicsWithMessages);
-    throw new Error("Not implemented");
-    return topicsWithMessages;
   }
 }
