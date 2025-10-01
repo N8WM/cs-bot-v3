@@ -1,7 +1,10 @@
 import {
-  ContextMenuCommandBuilder,
+  MessageFlags,
+  TextDisplayBuilder,
   ApplicationCommandType,
-  InteractionContextType
+  InteractionContextType,
+  ContextMenuCommandBuilder,
+  ContainerBuilder
 } from "discord.js";
 
 import { CommandHandler } from "@registry";
@@ -15,13 +18,22 @@ const handler: CommandHandler<ApplicationCommandType.Message> = {
     .setContexts(InteractionContextType.Guild),
 
   async run({ interaction }) {
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
 
-    const stages: string[] = [];
+    const statusContainer = new ContainerBuilder();
+
     const updateCb = async (msg: string) => {
-      stages.push(msg);
-      await interaction.editReply({ content: stages.join("\n") });
+      statusContainer.addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(msg)
+      );
+
+      // await interaction.editReply({
+      //   components: [statusContainer],
+      //   flags: [MessageFlags.IsComponentsV2]
+      // });
     };
+
+    await updateCb("Warming up...");
 
     const result = await RecallSequence.execute(
       interaction.targetMessage.content,
@@ -31,7 +43,17 @@ const handler: CommandHandler<ApplicationCommandType.Message> = {
       updateCb
     );
 
-    await interaction.followUp({ content: result });
+    if (result.length === 0) result.push(
+      new TextDisplayBuilder()
+        .setContent("Sorry, I could not find any relevant information on that.")
+    );
+
+    await interaction.editReply({
+      components: result,
+      allowedMentions: { parse: [] },
+      flags: [MessageFlags.IsComponentsV2],
+      content: undefined
+    });
   }
 };
 

@@ -1,4 +1,7 @@
+import { Message as LLMMessage } from "ollama";
 import { Message as DiscordMessage } from "discord.js";
+
+import { Result } from "@util/result";
 
 import { LLMSession } from "../../context/sessions/llmSession";
 import { TopicSession } from "../../context/sessions/topicSession";
@@ -6,7 +9,6 @@ import { MessageSession } from "../../context/sessions/messageSession";
 
 import { RecordTools } from "./recordTools";
 import { RecordPrompts } from "./recordPrompts";
-import { Result } from "@util/result";
 
 export class RecordSequence {
   static async execute(
@@ -17,6 +19,8 @@ export class RecordSequence {
     const messageSession = new MessageSession(discordMessage);
     const topicSession = new TopicSession({ messageSession });
     const llmSession = new LLMSession();
+
+    const toolResult: LLMMessage = { role: "tool", content: "done" };
 
     // Initial prompt
 
@@ -46,6 +50,8 @@ export class RecordSequence {
 
     while (call && c++ < loopMax) {
       updateCb(`Expanding context (${c})...`);
+
+      await llmSession.message(toolResult, { flush: false });
 
       const args = call.function.arguments as { temporalDirection: "before" | "after" };
 
@@ -97,6 +103,7 @@ export class RecordSequence {
     if (call) {
       const args = call.function.arguments as { messageIds: string[] };
       messageSession.refine(args.messageIds);
+      await llmSession.message(toolResult, { flush: false });
     }
 
     // Summarization
@@ -151,6 +158,8 @@ export class RecordSequence {
       updateCb("Creating new topic...");
       return Result.ok(await topicSession.createNewTopic());
     }
+
+    await llmSession.message(toolResult, { flush: false });
 
     const funcs = ["updateExistingTopic", "overwriteExistingTopic"] as const;
 

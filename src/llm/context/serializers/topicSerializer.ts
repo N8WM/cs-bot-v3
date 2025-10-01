@@ -47,16 +47,16 @@ export class UserTopic {
 
 const serializeTopic = (topic: Topic) => create({
   Topic: {
-    "@id": topic.id,
-    "Summary": { $: escapeCData(topic.summary) }
+    topicId: topic.id,
+    topicSummary: { $: escapeCData(topic.summary) }
   }
 }).end({ prettyPrint: true, headless: true });
 
 const serializeTopicWithMsgs = (topic: Topic, messages: Message[]) => create({
   Topic: {
-    "@id": topic.id,
-    "Summary": { $: escapeCData(topic.summary) },
-    "Messages": {
+    topicId: topic.id,
+    topicSummary: { $: escapeCData(topic.summary) },
+    topicMessages: {
       Message: messages
         .toSorted(UserMessage.dbComparator)
         .map((m) => msgJSON(m).Message)

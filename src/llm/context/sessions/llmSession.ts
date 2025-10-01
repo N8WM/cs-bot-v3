@@ -2,7 +2,7 @@ import ollama, { ChatResponse, Message, Options, Tool } from "ollama";
 import { Logger } from "@logger";
 
 export class LLMSession {
-  static model: string = "gpt-oss:20b";
+  static model: string = "gpt-oss:120b-cloud";
 
   private readonly _messages: Message[];
 
@@ -28,7 +28,7 @@ export class LLMSession {
     options: { flush?: boolean; tools?: Tool[] } = { flush: true }
   ) {
     const opts = {
-      flush: options.flush ?? true,
+      flush: options.flush === true,
       tools: options.tools ?? undefined
     };
 
@@ -39,7 +39,12 @@ export class LLMSession {
 
   async flush(tools?: Tool[]) {
     const response = await LLMSession.chat(this._messages, tools);
+
+    const thinking = response.message.thinking;
+    if (thinking) this._messages.push({ role: "assistant", content: `Thinking:\n${thinking}` });
+
     this._messages.push(response.message);
+
     return response;
   }
 
@@ -53,8 +58,7 @@ export class LLMSession {
     options?: Partial<Options>
   ) {
     Logger.debug(`Sending message to LLM Model "${LLMSession.model}"...`);
-    Logger.debug(`Messages:\n${messages.at(-1)!.content}`);
-    Logger.debug(`Tools:\n${JSON.stringify(tools)}`);
+    // Logger.debug(`Messages:\n${messages.at(-1)!.content}`);
     const response = await ollama.chat(
       {
         model: LLMSession.model,
@@ -65,7 +69,7 @@ export class LLMSession {
         options
       }
     );
-    Logger.debug(`Response:\n${response.message.content}`);
+    Logger.debug(`Response:\n${JSON.stringify(response.message)}`);
     Logger.debug(`Tool calls:\n${JSON.stringify(response.message.tool_calls)}`);
 
     return response;
