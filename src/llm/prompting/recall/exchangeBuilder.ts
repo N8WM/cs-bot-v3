@@ -50,7 +50,9 @@ export class ExchangeBuilder {
 
     container.addSectionComponents(
       new SectionBuilder().addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`-# <@${message.authorSnowflake}>  ${message.timestamp.toLocaleString("en-US", { timeStyle: "short", dateStyle: "short" })}`),
+        new TextDisplayBuilder().setContent(
+          `-# <@${message.authorSnowflake}>  ${message.timestamp.toLocaleString("en-US", { timeStyle: "short", dateStyle: "short" })}`
+        ),
         new TextDisplayBuilder().setContent(message.content)
       ).setButtonAccessory(
         new ButtonBuilder()

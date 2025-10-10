@@ -57,8 +57,6 @@ export class LLMSession {
     tools?: Tool[],
     options?: Partial<Options>
   ) {
-    Logger.debug(`Sending message to LLM Model "${LLMSession.model}"...`);
-    // Logger.debug(`Messages:\n${messages.at(-1)!.content}`);
     const response = await ollama.chat(
       {
         model: LLMSession.model,
@@ -69,8 +67,6 @@ export class LLMSession {
         options
       }
     );
-    Logger.debug(`Response:\n${JSON.stringify(response.message)}`);
-    Logger.debug(`Tool calls:\n${JSON.stringify(response.message.tool_calls)}`);
 
     return response;
   }

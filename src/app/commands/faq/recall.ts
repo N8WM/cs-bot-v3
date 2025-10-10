@@ -18,22 +18,32 @@ const handler: CommandHandler<ApplicationCommandType.Message> = {
     .setContexts(InteractionContextType.Guild),
 
   async run({ interaction }) {
-    await interaction.deferReply();
+    await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
     const statusContainer = new ContainerBuilder();
+    const componentLog: string[] = [];
+    const rebuildComponentLog = (msg: string, component: boolean) => {
+      if (component)
+        componentLog.push(msg);
 
-    const updateCb = async (msg: string) => {
-      statusContainer.addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(msg)
-      );
-
-      // await interaction.editReply({
-      //   components: [statusContainer],
-      //   flags: [MessageFlags.IsComponentsV2]
-      // });
+      return componentLog.length > 0
+        ? [new TextDisplayBuilder().setContent("`" + componentLog.join(" ") + "`")]
+        : [];
     };
 
-    await updateCb("Warming up...");
+    const updateCb = async (msg: string, component: boolean = false) => {
+      if (!component)
+        statusContainer.addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(msg)
+        );
+
+      await interaction.editReply({
+        components: [statusContainer, ...rebuildComponentLog(msg, component)],
+        flags: [MessageFlags.IsComponentsV2]
+      });
+    };
+
+    await updateCb("Starting job...");
 
     const result = await RecallSequence.execute(
       interaction.targetMessage.content,
@@ -43,16 +53,24 @@ const handler: CommandHandler<ApplicationCommandType.Message> = {
       updateCb
     );
 
-    if (result.length === 0) result.push(
-      new TextDisplayBuilder()
-        .setContent("Sorry, I could not find any relevant information on that.")
-    );
+    if (result.length === 0)
+      result.push(
+        new TextDisplayBuilder().setContent(`> ${interaction.targetMessage.content}\n`),
+        new ContainerBuilder().addTextDisplayComponents(
+          new TextDisplayBuilder().setContent([
+            "**No relevant topics were found. Try asking in chat!**\n",
+            "\n",
+            "-# The information required to answer this question has not yet been recorded. ",
+            "To record a discussion topic, open the context menu on a related message using ",
+            "right-click/long-press. Then select:\n-# `Apps > Remember Topic`"
+          ].join(""))
+        ).setAccentColor([255, 50, 50])
+      );
 
     await interaction.editReply({
       components: result,
       allowedMentions: { parse: [] },
-      flags: [MessageFlags.IsComponentsV2],
-      content: undefined
+      flags: [MessageFlags.IsComponentsV2]
     });
   }
 };

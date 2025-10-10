@@ -13,7 +13,7 @@ export class RecallSequence {
     timestamp: Date,
     askerId: string,
     guildSnowflake: string,
-    updateCb: (msg: string) => Promise<any>
+    updateCb: (msg: string, component?: boolean) => Promise<any>
   ) {
     const topicSession = new TopicSession({ guildSnowflake });
     const llmSession = new LLMSession();
@@ -89,12 +89,12 @@ export class RecallSequence {
             exchange.userQuote(umArgs.messageId);
             whatAdded.push(umArgs.messageId);
 
-            await updateCb(".");
+            await updateCb(".", true);
             break;
           case "separator":
             exchange.separator();
             whatAdded.push("separator");
-            await updateCb("-");
+            await updateCb("-", true);
             break;
           case "context":
           default:
@@ -103,7 +103,7 @@ export class RecallSequence {
             exchange.context(cArgs.content);
             whatAdded.push(`"${cArgs.content}"`);
 
-            await updateCb("\\>");
+            await updateCb(">", true);
         }
         await llmSession.message(toolResult, { flush: false });
       }
